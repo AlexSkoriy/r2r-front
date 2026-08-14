@@ -1,7 +1,7 @@
 import vk from "@/public/icons/vk.svg"
 import tg from "@/public/icons/tg.svg"
 import ok from "@/public/icons/ok.svg"
-import logo from "@/public/images/logo2.png"
+import logo from "@/public/images/logo-block-boss.png"
 import imageEdging from "@/public/images/imageEdging.png"
 import Image from "next/image"
 import { IGlobal } from "@/types"
@@ -38,12 +38,12 @@ export default function FirstFrame({ global }: { global: IGlobal }) {
           <span className="text-[20px] ml-[20px] hidden desktop:block tablet:hidden">Follow us and stay tuned</span>
         </div>
         <div className="flex items-center justify-center desktop:order-2 order-1 w-[86px] desktop:w-full">
-          <Image src={logo} width={193} height={73} alt="" />
+          <Image src={logo} width={619} height={427} alt="Block Boss" className="h-[58px] w-auto desktop:h-[116px]" />
         </div>
         <Sound />
       </header>
 
-      <div className="flex desktop:h-[calc(100dvh-73px-76px)] h-[calc(100dvh-36px-9.5dvh)] items-start justify-start pointer-events-none flex-col-reverse desktop:flex-row desktop:gap-[48px]">
+      <div className="flex desktop:h-[calc(100dvh-116px-76px)] h-[calc(100dvh-58px-9.5dvh)] items-start justify-start pointer-events-none flex-col-reverse desktop:flex-row desktop:gap-[48px]">
 
         {/* <div className="relative desktop:w-[1219px] desktop:min-h-full h-full w-full overflow-hidden fullscreen:w-full">
           <div className="absolute bottom-0 low:top-0 desktop:h1012:top-0 fullscreen:w-full">
