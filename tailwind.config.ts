@@ -15,6 +15,8 @@ const config: Config = {
         fullscreen: "1921px",
         // desktop: "1472px",
         'ph': {'max': '531px'},
+        // очень узкие телефоны (iPhone SE, Galaxy Fold): шапка там на пределе по ширине
+        'phxs': {'max': '359px'},
         'tablet': {'max': '1320px'},
         '1142': {'max': '1142px'},
         'low': { 'raw': '(max-height: 767px)' },
