@@ -37,3 +37,6 @@ next-env.d.ts
 
 # local env
 .env.local
+
+# dev env для docker compose
+.env

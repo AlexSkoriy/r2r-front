@@ -1,0 +1,53 @@
+# Dev-окружение сайта: dev.r2r.studio
+#
+# Отличия от прода (docker-compose.yml):
+#   - один контейнер вместо blue/green и трёх реплик — dev не нужна беспростойная выкладка
+#   - свой домен и свой Traefik-роутер, прод не затрагивается вообще
+#   - закрыт базовой авторизацией, чтобы дев не утёк в поисковики и посторонним
+#   - CMS та же, что у прода (cms.r2r.studio) — сайт только читает данные, писать некуда
+#
+# Запуск:  docker compose -f docker-compose.dev.yml up -d --build
+
+services:
+  dev-web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_SITE_FRONT: "https://dev.r2r.studio"
+        NEXT_PUBLIC_SITE_BACK: "https://cms.r2r.studio"
+    image: r2r-front-dev:latest
+    container_name: r2r-front-dev
+    restart: unless-stopped
+    environment:
+      - "PORT=3000"
+      - "HOSTNAME=0.0.0.0"
+      - "NEXT_PUBLIC_SITE_FRONT=https://dev.r2r.studio"
+      - "NEXT_PUBLIC_SITE_BACK=https://cms.r2r.studio"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3000/api/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    labels:
+      traefik.enable: 'true'
+      traefik.docker.network: 'web'
+      traefik.http.services.r2r-front-dev.loadbalancer.server.port: '3000'
+
+      traefik.http.routers.r2r-front-dev.rule: 'Host(`dev.r2r.studio`)'
+      traefik.http.routers.r2r-front-dev.entrypoints: 'websecure'
+      traefik.http.routers.r2r-front-dev.tls: 'true'
+      traefik.http.routers.r2r-front-dev.tls.certresolver: 'letsencryptprod'
+
+      # базовая авторизация: логин/пароль спросит браузер.
+      # Хеш генерируется командой из DEPLOY-DEV.md, знаки $ обязательно удвоить.
+      traefik.http.middlewares.r2r-dev-auth.basicauth.users: '${DEV_BASIC_AUTH}'
+      # запрещаем индексацию на всякий случай, даже если авторизацию снимут
+      traefik.http.middlewares.r2r-dev-noindex.headers.customresponseheaders.X-Robots-Tag: 'noindex, nofollow'
+      traefik.http.routers.r2r-front-dev.middlewares: 'r2r-dev-auth,r2r-dev-noindex'
+
+networks:
+  default:
+    name: web
+    external: true
