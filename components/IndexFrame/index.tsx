@@ -60,27 +60,25 @@ export default function FirstFrame({ global }: { global: IGlobal }) {
 
         <div className="flex-1 desktop:mt-[30px] desktop:mr-[80px]  fullscreen:mr-[200px] pl-[20px] mt-[20px] desktop:pl-0 ">
           <div className="font-drukcyr desktop:h1012:text-[17dvh] desktop:h1012:leading-[15dvh] text-[8.5dvh]  desktop:text-[8.7vw] !tracking-[0px] desktop:!tracking-[-1] leading-[7.5dvh] desktop:leading-[7.8vw]  mt-[5px] desktop:mt-0  uppercase font-bold">
-            <div className="animate-fade-left animate-duration-500 animate-delay-[500ms]">Extort </div>
-            <div className="animate-fade-left animate-duration-500 animate-delay-[800ms]">Racket </div>
-            <div className="animate-fade-left animate-duration-500 animate-delay-[1100ms] whitespace-nowrap">Trade&nbsp;
+            <div className="animate-fade-left animate-duration-500 animate-delay-[500ms]">Seize </div>
+            <div className="animate-fade-left animate-duration-500 animate-delay-[800ms]">Trade </div>
+            <div className="animate-fade-left animate-duration-500 animate-delay-[1100ms] whitespace-nowrap">Cover&nbsp;
               <span className=" desktop:leading-[7.2vw] ml-[0px] desktop:ml-[10px] text-[3.44dvh] desktop:text-[3.2vw]  destop:leading-[10dvh] align-top ">★</span>
             </div>
           </div>
           <p className="desktop:text-[20px] text-[15px]  desktop:w-[262px] w-[209px] uppercase animate-fade-left animate-duration-500 animate-delay-[1400ms] mt-[2dvh] desktop:h1012:mt-[2dvh] desktop:mt-[25px] leading-[21px] desktop:leading-[24px] tracking-[0.1px] desktop:tracking-[0.5px]">
-            turn-based strategy with&nbsp;the spirit of&nbsp;the 90s
+            Dice Roll Business empire RPG
           </p>
 
           <div className="flex items-center gap-[10px] desktop:mt-[50px] mt-[25px]">
             <div className="relative">
-              {!linkApp1 && <div className="absolute z-10 text-[15px] desktop:text-[20px] font-[500] rounded-[11px] inset-0 backdrop-blur-sm flex items-center justify-center text-skin">Soon</div>}
-              <Link className={`rounded-[11px] relative pointer-events-auto bg-skin desktop:w-[190px] desktop:h-[74px] w-[139px] h-[59px] flex items-center justify-center shadow-[0px_6px_0px_0px_#b8341f] ${!linkApp1 && "opacity-20"}`} href={linkApp1 ?? "#"} >
-                <img className="w-[107px] h-[25px] desktop:w-[146px] h-[35px]" src="/icons/google_play.svg" width={146} height={35} />
+              <Link className="rounded-[11px] relative pointer-events-auto bg-skin desktop:w-[190px] desktop:h-[74px] w-[139px] h-[59px] flex items-center justify-center shadow-[0px_6px_0px_0px_#b8341f]" href={linkApp1 ?? "#"} >
+                <img className="w-[107px] h-[25px] desktop:w-[146px] desktop:h-[35px]" src="/icons/google_play.svg" width={146} height={35} />
               </Link>
             </div>
             <div className="relative">
-              {!linkApp2 && <div className="absolute z-10 text-[15px] desktop:text-[20px] font-[500] rounded-[11px] inset-0 backdrop-blur-sm flex items-center justify-center text-skin">Soon</div>}
-              <Link className={`rounded-[11px] relative pointer-events-auto bg-skin desktop:w-[190px] desktop:h-[74px] w-[139px] h-[59px] flex items-center justify-center shadow-[0px_6px_0px_0px_#b8341f] ${!linkApp2 && "opacity-20"}`} href={linkApp2 ?? "#"} >
-                <img className="w-[107px] h-[29px] desktop:w-[146px] h-[40px]" src="/icons/app_store.svg" width={146} height={40} />
+              <Link className="rounded-[11px] relative pointer-events-auto bg-skin desktop:w-[190px] desktop:h-[74px] w-[139px] h-[59px] flex items-center justify-center shadow-[0px_6px_0px_0px_#b8341f]" href={linkApp2 ?? "#"} >
+                <img className="w-[107px] h-[29px] desktop:w-[146px] desktop:h-[40px]" src="/icons/app_store.svg" width={146} height={40} />
               </Link>
             </div>
           </div>
