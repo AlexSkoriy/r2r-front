@@ -1,0 +1,72 @@
+# АВАРИЙНОЕ ВОССТАНОВЛЕНИЕ ПРОДА — вариант 2 (если образа на сервере не осталось).
+#
+# Здесь сайт собирается из исходников прямо на сервере, нашим Dockerfile,
+# без обращения к реестру подрядчика.
+#
+# ВАЖНО, ПОРЯДОК ДЕЙСТВИЙ:
+#   git checkout 098f0d5      # исходное состояние сайта, то самое, что было на проде
+#   docker compose -f docker-compose.prod-rebuild.yml up -d --build
+#
+# Коммит 098f0d5 — это русская версия сайта в том виде, в каком она работала.
+# НЕ собирайте из master: там английская версия, она на прод ещё не согласована.
+#
+# Отличия от варианта 1: наш образ слушает порт 3000 (а не 5000, как сборка
+# через buildpacks), работает не из /workspace и не требует пользователя 744.
+
+services:
+  prod-web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_SITE_FRONT: "https://r2r.studio"
+        NEXT_PUBLIC_SITE_BACK: "https://cms.r2r.studio"
+    image: r2r-front-prod:restored
+    container_name: r2r-front-prod
+    restart: unless-stopped
+    environment:
+      - "PORT=3000"
+      - "HOSTNAME=0.0.0.0"
+      - "NEXT_PUBLIC_SITE_FRONT=https://r2r.studio"
+      - "NEXT_PUBLIC_SITE_BACK=https://cms.r2r.studio"
+      - "PUBLIC_STRAPI_URL=https://cms.r2r.studio"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3000/api/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    labels:
+      traefik.enable: 'true'
+      traefik.docker.network: 'web'
+      traefik.http.services.r2r-front.loadbalancer.server.port: '3000'
+      traefik.http.services.r2r-front.loadbalancer.healthCheck.path: /api/health
+      traefik.http.services.r2r-front.loadbalancer.healthCheck.interval: 5s
+      traefik.http.services.r2r-front.loadbalancer.healthCheck.timeout: 2s
+
+      traefik.http.routers.r2r-front.rule: 'Host(`r2r.studio`)'
+      traefik.http.routers.r2r-front.entrypoints: "websecure"
+      traefik.http.routers.r2r-front.tls: "true"
+      traefik.http.routers.r2r-front.tls.certresolver: 'letsencryptprod'
+
+      traefik.http.routers.r2r-front-www.rule: 'Host(`www.r2r.studio`)'
+      traefik.http.routers.r2r-front-www.entrypoints: "websecure"
+      traefik.http.routers.r2r-front-www.tls: "true"
+      traefik.http.routers.r2r-front-www.tls.certresolver: 'letsencryptprod'
+      traefik.http.middlewares.r2r-redirect-www.redirectregex.regex: ^https://www.r2r.studio(/?)(.*)
+      traefik.http.middlewares.r2r-redirect-www.redirectregex.replacement: https://r2r.studio/$${2}
+      traefik.http.middlewares.r2r-redirect-www.redirectregex.permanent: true
+      traefik.http.routers.r2r-front-www.middlewares: r2r-redirect-www
+
+      traefik.http.routers.r2r-sitemap-reverse.rule: '(Host(`r2r.studio`)) && Path(`/sitemap.xml`)'
+      traefik.http.routers.r2r-sitemap-reverse.entrypoints: "websecure"
+      traefik.http.routers.r2r-sitemap-reverse.tls: "true"
+      traefik.http.routers.r2r-sitemap-reverse.tls.certresolver: 'letsencryptprod'
+      traefik.http.routers.r2r-sitemap-reverse.service: 'strapi-r2r-studio@docker'
+      traefik.http.middlewares.sitemap-replacepath.replacepath.path: /sitemap/index.xml
+      traefik.http.routers.r2r-sitemap-reverse.middlewares: sitemap-replacepath
+
+networks:
+  default:
+    name: web
+    external: true

@@ -1,0 +1,79 @@
+# АВАРИЙНОЕ ВОССТАНОВЛЕНИЕ ПРОДА — вариант 1 (быстрый).
+#
+# Использовать, если на сервере ЕЩЁ ЕСТЬ образ, который работал до удаления
+# (проверяется командой `docker images`). Тогда ничего собирать не надо —
+# мы просто заново поднимаем контейнер с теми же метками Traefik, что были раньше.
+#
+# Запуск:
+#   export R2R_IMAGE=<полное имя образа из docker images>
+#   docker compose -f docker-compose.prod-restore.yml up -d
+#
+# Отличия от исходного docker-compose.yml: одна реплика вместо трёх и один сервис
+# вместо blue/green. Для восстановления работы этого достаточно, blue-green нужен
+# только для выкладки без простоя. Метки Traefik, порт, пользователь и volume —
+# ровно как в оригинале.
+
+services:
+  volumes-init:
+    image: alpine
+    restart: "no"
+    entrypoint: |
+      /bin/sh -c "chown -R 744:744 /workspace/.next/cache"
+    volumes:
+      - "front-next-cache:/workspace/.next/cache"
+
+  blue-web:
+    depends_on:
+      - volumes-init
+    image: "${R2R_IMAGE}"
+    container_name: blue-web
+    restart: unless-stopped
+    # UID/GID пользователя cnb в образе, собранном через buildpacks
+    user: "744:744"
+    environment:
+      - "PORT=5000"
+      - "HOST=0.0.0.0"
+      - "PUBLIC_STRAPI_URL=https://cms.r2r.studio"
+    volumes:
+      - "front-next-cache:/workspace/.next/cache"
+    labels:
+      traefik.enable: 'true'
+      traefik.docker.network: 'web'
+      traefik.http.services.r2r-front.loadbalancer.server.port: '5000'
+      traefik.http.middlewares.front-retry.retry.attempts: 5
+      traefik.http.middlewares.front-retry.retry.initialinterval: 200ms
+      traefik.http.services.r2r-front.loadbalancer.healthCheck.path: /api/health
+      traefik.http.services.r2r-front.loadbalancer.healthCheck.interval: 5s
+      traefik.http.services.r2r-front.loadbalancer.healthCheck.timeout: 1s
+
+      traefik.http.routers.r2r-front.rule: 'Host(`r2r.studio`)'
+      traefik.http.routers.r2r-front.entrypoints: "websecure"
+      traefik.http.routers.r2r-front.tls: "true"
+      traefik.http.routers.r2r-front.tls.certresolver: 'letsencryptprod'
+
+      # редирект www на не-www
+      traefik.http.routers.r2r-front-www.rule: 'Host(`www.r2r.studio`)'
+      traefik.http.routers.r2r-front-www.entrypoints: "websecure"
+      traefik.http.routers.r2r-front-www.tls: "true"
+      traefik.http.routers.r2r-front-www.tls.certresolver: 'letsencryptprod'
+      traefik.http.middlewares.r2r-redirect-www.redirectregex.regex: ^https://www.r2r.studio(/?)(.*)
+      traefik.http.middlewares.r2r-redirect-www.redirectregex.replacement: https://r2r.studio/$${2}
+      traefik.http.middlewares.r2r-redirect-www.redirectregex.permanent: true
+      traefik.http.routers.r2r-front-www.middlewares: r2r-redirect-www
+
+      # /sitemap.xml проксируется в Strapi
+      traefik.http.routers.r2r-sitemap-reverse.rule: '(Host(`r2r.studio`)) && Path(`/sitemap.xml`)'
+      traefik.http.routers.r2r-sitemap-reverse.entrypoints: "websecure"
+      traefik.http.routers.r2r-sitemap-reverse.tls: "true"
+      traefik.http.routers.r2r-sitemap-reverse.tls.certresolver: 'letsencryptprod'
+      traefik.http.routers.r2r-sitemap-reverse.service: 'strapi-r2r-studio@docker'
+      traefik.http.middlewares.sitemap-replacepath.replacepath.path: /sitemap/index.xml
+      traefik.http.routers.r2r-sitemap-reverse.middlewares: sitemap-replacepath
+
+networks:
+  default:
+    name: web
+    external: true
+
+volumes:
+  front-next-cache:
