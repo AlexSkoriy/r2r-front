@@ -2,7 +2,7 @@ import { IGlobal } from "@/types";
 
 // Get site data from Strapi (metadata, navbar, footer...)
 export async function getGlobalData() {
-  const gqlEndpoint = "https://cms.r2r.studio/graphql";
+  const gqlEndpoint = `${process.env.NEXT_PUBLIC_SITE_BACK}/graphql`;
   const globalRes = await fetch(gqlEndpoint, {
     method: "POST",
     headers: {

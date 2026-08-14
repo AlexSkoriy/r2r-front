@@ -2,7 +2,7 @@ import { IGlobal, IPage } from "@/types";
 
 // Get site data from Strapi (metadata, navbar, footer...)
 export async function getPageData(slug: string): Promise<IPage> {
-  const gqlEndpoint = "https://cms.r2r.studio/graphql";
+  const gqlEndpoint = `${process.env.NEXT_PUBLIC_SITE_BACK}/graphql`;
   const pageRes = await fetch(gqlEndpoint, {
     method: "POST",
     headers: {

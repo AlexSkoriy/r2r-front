@@ -35,7 +35,7 @@ export default function FirstFrame({ global }: { global: IGlobal }) {
           <a href={global.data.global.data.attributes.link_vk} className="border-[2px] border-skin rounded-full desktop:h-[60px] h-[36px] desktop:w-[60px] w-[36px] flex items-center justify-center" target="_blank"><Image className="w-[10px] desktop:w-[19px]" src={vk} width={19} height={14} alt="" /></a>
           <a href={global.data.global.data.attributes.link_tg} className="border-[2px] border-skin rounded-full desktop:h-[60px] h-[36px] desktop:w-[60px] w-[36px] flex items-center justify-center" target="_blank"><Image className="w-[10px] desktop:w-[19px]" src={tg} width={19} height={11} alt="" /></a>
           <a href={global.data.global.data.attributes.link_ok} className="border-[2px] border-skin rounded-full desktop:h-[60px] h-[36px] desktop:w-[60px] w-[36px] flex items-center justify-center" target="_blank"><Image className="w-[20px] desktop:w-[29px]" src={ok} width={29} height={20} alt="" /></a>
-          <span className="text-[20px] ml-[20px] hidden desktop:block tablet:hidden">Подписывайся и следи</span>
+          <span className="text-[20px] ml-[20px] hidden desktop:block tablet:hidden">Follow us and stay tuned</span>
         </div>
         <div className="flex items-center justify-center desktop:order-2 order-1 w-[86px] desktop:w-full">
           <Image src={logo} width={193} height={73} alt="" />
@@ -60,25 +60,25 @@ export default function FirstFrame({ global }: { global: IGlobal }) {
 
         <div className="flex-1 desktop:mt-[30px] desktop:mr-[80px]  fullscreen:mr-[200px] pl-[20px] mt-[20px] desktop:pl-0 ">
           <div className="font-drukcyr desktop:h1012:text-[17dvh] desktop:h1012:leading-[15dvh] text-[8.5dvh]  desktop:text-[8.7vw] !tracking-[0px] desktop:!tracking-[-1] leading-[7.5dvh] desktop:leading-[7.8vw]  mt-[5px] desktop:mt-0  uppercase font-bold">
-            <div className="animate-fade-left animate-duration-500 animate-delay-[500ms]">Отжимай </div>
-            <div className="animate-fade-left animate-duration-500 animate-delay-[800ms]">Крышуй </div>
-            <div className="animate-fade-left animate-duration-500 animate-delay-[1100ms] whitespace-nowrap">Торгуй&nbsp;
+            <div className="animate-fade-left animate-duration-500 animate-delay-[500ms]">Extort </div>
+            <div className="animate-fade-left animate-duration-500 animate-delay-[800ms]">Racket </div>
+            <div className="animate-fade-left animate-duration-500 animate-delay-[1100ms] whitespace-nowrap">Trade&nbsp;
               <span className=" desktop:leading-[7.2vw] ml-[0px] desktop:ml-[10px] text-[3.44dvh] desktop:text-[3.2vw]  destop:leading-[10dvh] align-top ">★</span>
             </div>
           </div>
           <p className="desktop:text-[20px] text-[15px]  desktop:w-[262px] w-[209px] uppercase animate-fade-left animate-duration-500 animate-delay-[1400ms] mt-[2dvh] desktop:h1012:mt-[2dvh] desktop:mt-[25px] leading-[21px] desktop:leading-[24px] tracking-[0.1px] desktop:tracking-[0.5px]">
-            пошаговая стратегия с&nbsp;духом 90х
+            turn-based strategy with&nbsp;the spirit of&nbsp;the 90s
           </p>
 
           <div className="flex items-center gap-[10px] desktop:mt-[50px] mt-[25px]">
             <div className="relative">
-              {!linkApp1 && <div className="absolute z-10 text-[15px] desktop:text-[20px] font-[500] rounded-[11px] inset-0 backdrop-blur-sm flex items-center justify-center text-skin">Скоро</div>}
+              {!linkApp1 && <div className="absolute z-10 text-[15px] desktop:text-[20px] font-[500] rounded-[11px] inset-0 backdrop-blur-sm flex items-center justify-center text-skin">Soon</div>}
               <Link className={`rounded-[11px] relative pointer-events-auto bg-skin desktop:w-[190px] desktop:h-[74px] w-[139px] h-[59px] flex items-center justify-center shadow-[0px_6px_0px_0px_#b8341f] ${!linkApp1 && "opacity-20"}`} href={linkApp1 ?? "#"} >
                 <img className="w-[107px] h-[25px] desktop:w-[146px] h-[35px]" src="/icons/google_play.svg" width={146} height={35} />
               </Link>
             </div>
             <div className="relative">
-              {!linkApp2 && <div className="absolute z-10 text-[15px] desktop:text-[20px] font-[500] rounded-[11px] inset-0 backdrop-blur-sm flex items-center justify-center text-skin">Скоро</div>}
+              {!linkApp2 && <div className="absolute z-10 text-[15px] desktop:text-[20px] font-[500] rounded-[11px] inset-0 backdrop-blur-sm flex items-center justify-center text-skin">Soon</div>}
               <Link className={`rounded-[11px] relative pointer-events-auto bg-skin desktop:w-[190px] desktop:h-[74px] w-[139px] h-[59px] flex items-center justify-center shadow-[0px_6px_0px_0px_#b8341f] ${!linkApp2 && "opacity-20"}`} href={linkApp2 ?? "#"} >
                 <img className="w-[107px] h-[29px] desktop:w-[146px] h-[40px]" src="/icons/app_store.svg" width={146} height={40} />
               </Link>

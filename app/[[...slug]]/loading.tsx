@@ -40,7 +40,7 @@ export default function Loader() {
           />
         </div>
         <span className="text-[18px] animate-flip-down">
-          Не очкуй, ща все будет
+          Chill out, almost there
         </span>
       </div>
       <div className=" absolute desktop:right-[50px] desktop:bottom-[50px] bottom-[15px] right-[20px] desktop:text-[166px] text-[95px] font-drukcyr font-bold">

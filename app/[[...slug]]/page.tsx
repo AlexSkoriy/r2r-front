@@ -49,8 +49,6 @@ export default async function Home(props: {
   const global = await getGlobalData();
   const page = await getPageData(slug);
 
-  console.log("DDAAAAT", slug, page.data.pages.data[0]);
-
   if (!page.data.pages.data[0]) {
     return notFound();
   }

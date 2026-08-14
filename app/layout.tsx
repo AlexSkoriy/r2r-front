@@ -13,7 +13,7 @@ export default function RootLayout({
 }>) {
 
   return (
-    <html lang="ru">
+    <html lang="en">
       <body>
         <State>
           {children}

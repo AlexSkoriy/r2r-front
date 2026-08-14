@@ -40,9 +40,9 @@ export function helperGenerateMetadata({
     openGraph: {
       title,
       url,
-      locale: "ru_RU",
+      locale: "en_US",
       type: "website",
-      siteName: "Рынок пацана - картон на асфальте",
+      siteName: "Block Boss: Market Bros",
       description,
       images: og_image
         ? [
