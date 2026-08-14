@@ -1,0 +1,41 @@
+include:
+  - project: 'devops/gitlab/ci-manifests'
+    ref: master
+    file:
+      - '/Workflows/S2.RoR.CNB.gitlab-ci.yml'
+  # - local: /.gitlab/geeks.yml
+
+  # deploy to Geeks cluster
+  #- local: /.gitlab/geeks.yml
+
+# Check out: http://docs.gitlab.com/ee/ci/docker/using_docker_images.html#what-is-a-service
+variables:
+  # тэгируем образ в виде pipeline ID с префиксом s2, а не по git commit hash
+  IMAGE_TAG_BUILDID: "s2"
+  # имя проекта в docker-compose
+  HELM_RELEASE_NAME: "r2r-front"
+  AUTO_DEVOPS_BUILD_IMAGE_CNB_BUILDER: "harbor.infra.s2app.ru/buildpacks/builders/s2erp-builder:ubuntu-jammy"
+
+  # !!! ОБЯЗАТЕЛЬНО задать переменную DEPLOY_METHOD: "docker-compose" на уровне проекта!
+  # стратегия blue-green по статье https://www.maxcountryman.com/articles/zero-downtime-deployments-with-docker-compose
+  # для работы blue-green стратегии в приложении обязательно должен быть healthcheck route!
+  BLUE_GREEN_HEALTHCHECK_ROUTE: 'api/health'
+  DEPLOY_STRATEGY: blue-green
+  # имя сервиса, в котором менять строку image при деплое
+  SERVICE_NAME: blue-web
+  SERVICE_PORT: 5000
+
+  ###############################################################################################################
+  # дальше можно ничего не трогать
+  ###############################################################################################################
+  TESTS_RUBY_IMAGE: ""
+  RUBY_LINT_DISABLED: "1"
+  RUBY_TESTS_YARN_JEST_DISABLED: "1"
+
+.deploy:production:
+  resource_group: "${CI_PROJECT_PATH_SLUG}-prod"
+  tags:
+    - r2r
+
+# TODO: запилить деплоилку через https://containrrr.dev/watchtower/ или https://www.maxcountryman.com/articles/zero-downtime-deployments-with-docker-compose
+# для zero-downtime deploy

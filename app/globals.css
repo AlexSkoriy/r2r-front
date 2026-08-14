@@ -1,0 +1,37 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  /* font-family: "Druk Cyr"; */
+  /* @apply font-drukcyr */
+  @apply text-skin bg-skin
+}
+
+.font-drukcyr {
+  @apply desktop:tracking-[-1px] desktop:font-[500] tracking-[-1px] font-[500]
+}
+
+
+/* W3C standard
+   сейчас только для Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #dc4c34 #ffffff00;
+}
+
+/* для Chrome/Edge/Safari */
+*::-webkit-scrollbar {
+  height: 12px;
+  width: 12px;
+}
+
+*::-webkit-scrollbar-track {
+  background: #dc4c34;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: #dc4c34;
+  border-radius: 15px;
+  border: 3px solid #dc4c34;
+}

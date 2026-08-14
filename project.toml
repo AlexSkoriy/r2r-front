@@ -1,0 +1,79 @@
+# https://github.com/buildpacks/spec/blob/main/extensions/project-descriptor.md
+[_]
+  id             = "studio.r2r.frontend"
+  # версия проекта. Значение ни на что не влияет
+  version        = "1.0.0"
+  schema-version = "0.2"
+  source-url     = "https://gl.salesap.ru/other/r2r"
+
+# версия NodeJS
+[[io.buildpacks.build.env]]
+  name  = "BP_NODE_VERSION"
+  value = "~20"
+
+# compile/run Next.JS in production mode
+[[io.buildpacks.build.env]]
+  name  = "NODE_ENV"
+  value = "production"
+
+[[io.buildpacks.build.env]]
+  name  = "PUBLIC_STRAPI_URL"
+  value = "https://cms.r2r.studio"
+
+[io.buildpacks]
+# The .gitignore pattern is used in both cases
+# Any files that are excluded (either via include or exclude) MUST BE excluded before the build (i.e. not only excluded from the final image).
+  # исключаем некоторые файлы/каталоги из образа, т.к. они не нужны и/или могут содержать чувствительную информацию
+  exclude = [
+    "/.cache/",
+    # ".env*",
+    "/.gems/",
+    "/.gitlab/",
+    "/.gitlab-ci.yml",
+    "/.idea/",
+    "/.ruby-gemset",
+    "/bitbucket-pipelines.yml",
+    "/box.config.yml",
+    "/config/deploy/",
+    "/config/master.key",
+    "/*Dockerfile*",
+    "/log/",
+
+    # do not copy locally compiled assets to docker image
+    "/node_modules/",
+
+    # ignore rails specs/tests
+    "/spec/",
+    "/tmp/cache/",
+    "/tmp/pids/",
+    "/tmp/sockets/",
+
+    # ignore some temporary/system files in all paths
+    "*.sock",
+    "*.log",
+    "*.lock",
+    "*.bak",
+
+    # exclude some required files from ignoring
+    "!/yarn.lock",
+    "!/Gemfile.lock"
+  ]
+
+################################################
+# Переменные ниже этой линии лучше не менять :-)
+################################################
+
+# специальная переменная, отключающая некоторые проверки во время билда
+[[io.buildpacks.build.env]]
+  name  = "DOCKER_IMAGE_BUILDING"
+  value = "1"
+
+# чтобы Sentry не реагировал, если будут ошибки во время билда
+[[io.buildpacks.build.env]]
+  name  = "SENTRY_CURRENT_ENV"
+  value = "building"
+
+# disable generating of launch.toml in our startup script because its not working with NodeJS apps
+[[io.buildpacks.build.env]]
+  name  = "BP_S2_STARTUP_MAKE_LAUNCH"
+  value = "false"

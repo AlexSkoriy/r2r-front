@@ -1,0 +1,44 @@
+#!/usr/bin/env ruby
+
+require 'active_support/core_ext/object/blank'
+
+def prompt(*args)
+  print(*args)
+  gets
+end
+
+TAG_PREFIXES = %w[s2].freeze
+DEFAULT_TAG = 's2'.freeze
+
+tag_prefix = prompt("Enter the tag prefix (#{TAG_PREFIXES.join('|')}) [#{DEFAULT_TAG}]: ").strip.presence || DEFAULT_TAG
+is_box = tag_prefix.include?('box-')
+excluded_box = %W[box-gb-test box-skillbox].include?(tag_prefix)
+
+current_git_branch = is_box && !excluded_box ? '_BOX_' : proc { `git rev-parse --abbrev-ref HEAD`.chomp }.call
+tag_branch = prompt("Enter the branch name [#{current_git_branch}]: ").strip.presence || current_git_branch
+
+tag_timestamp = Time.now.utc.strftime('%Y.%m.%d-%H%M')
+tag_name = "#{tag_prefix}-#{tag_timestamp}"
+
+# For box images we MUST provide JUST TAG (box name), without any additional text, like timestamp
+tag_name = tag_prefix if is_box
+
+puts ''
+should_deploy = prompt("The tag with name '#{tag_name}' based on git branch 'origin/#{tag_branch}' will be created. Process? (Y/n) [Y]: ").strip.presence || 'Y'
+
+puts ''
+if should_deploy == 'Y'
+  `git fetch -p` # synchronize origins to have a latest commit hashes
+  `git tag -f #{tag_name} origin/#{tag_branch}`
+  # remove tag for box from origin before pushing to remote, or Gitlab's CI/CD won't start
+  `git push origin :refs/tags/#{tag_name}` if is_box
+  `git push origin #{tag_name}`
+  `git tag -d #{tag_name}` # remove tag locally
+
+  puts ''
+  puts ''
+  puts "The tag '#{tag_name}' is created. Check the CI/CD page https://gl.salesap.ru/other/r2r/-/pipelines"
+else
+  puts 'Nothing happened. Bye bye!'
+  exit
+end

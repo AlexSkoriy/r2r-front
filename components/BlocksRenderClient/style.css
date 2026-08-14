@@ -1,0 +1,21 @@
+.blocksRenderer {
+  @apply overflow-hidden
+}
+.blocksRenderer h1 {
+  @apply text-[60px] leading-[62px] tracking-[0.8px] font-semibold text-black uppercase mb-[55px] 1142:mb-[30px] 1142:text-[31px] 1142:leading-[32px] 1142:tracking-[0.4px]
+}
+
+.blocksRenderer p {
+  @apply text-[20px] leading-[25px] tracking-[-0.2px] mt-[40px] 1142:mt-[30px] 1142:text-[16px] 1142:leading-[20px] 1142:tracking-[0.1px] text-[#666055]
+}
+
+.blocksRenderer ul {
+  @apply list-disc mt-[30px]
+}
+.blocksRenderer li {
+  @apply text-[#666055]
+}
+
+.blocksRenderer p strong {
+  @apply text-black
+}

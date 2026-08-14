@@ -1,0 +1,150 @@
+# при первом запуске deploy/replicas должно быть = 1, иначе будут конфликты за volume
+version: "3.9"
+
+services:
+  volumes-init:
+    image: alpine
+    restart: "no"
+    entrypoint: |
+      /bin/sh -c "chown -R 744:744 /workspace/.next/cache"
+    volumes:
+      - "front-next-cache:/workspace/.next/cache"
+
+  blue-web: &web
+    # container_name: blue-web
+    depends_on:
+      - volumes-init
+    image: 127.0.0.1:5000/stackdemo
+    # UID/GID пользователя cnb в контейнере
+    user: "744:744"
+    environment:
+      - "PORT=5000"
+      - "HOST=0.0.0.0"
+      # PUBLIC_STRAPI_URL нужно менять в project.toml
+      - "PUBLIC_STRAPI_URL=https://cms.r2r.studio"
+    # volumes:
+    volumes:
+      - "front-next-cache:/workspace/.next/cache"
+    # ports:
+    #   - "3000:3000"
+    # т.к. docker не в swarm, то делаем метки прям на контейнерах, а не на сервисе (секция deploy/labels)
+    labels:
+      traefik.enable: 'true'
+      # service name must be same as in HELM_RELEASE_NAME
+      # service port must be same as in SERVICE_PORT
+      traefik.http.services.r2r-front.loadbalancer.server.port: '5000'
+      # специальные настройки для blue-green deployment
+      traefik.http.middlewares.front-retry.retry.attempts: 5
+      traefik.http.middlewares.front-retry.retry.initialinterval: 200ms
+      # healthCheck.path as in BLUE_GREEN_HEALTHCHECK_ROUTE
+      traefik.http.services.r2r-front.loadbalancer.healthCheck.path: /api/health
+      traefik.http.services.r2r-front.loadbalancer.healthCheck.interval: 5s
+      traefik.http.services.r2r-front.loadbalancer.healthCheck.timeout: 1s
+
+      # traefik.http.middlewares.metabase_cors.headers.accesscontrolallowmethods: 'GET'
+      # traefik.http.middlewares.metabase_cors.headers.accesscontrolalloworiginlist: 'https://app.gb.salesap.ru,https://app.salesap.ru'
+      #
+      # traefik.http.middlewares.metabase_cors.headers.addvaryheader: 'true'
+      # || Host(`salesap.ru`)
+      traefik.http.routers.r2r-front.rule: 'Host(`r2r.studio`)'
+      # traefik.http.routers.metabase.middlewares: "metabase_cors{{ (swarm_metabase_basicauth | default([]) | length > 0) | ternary(',metabase_auth', '') }}"
+      traefik.http.routers.r2r-front.entrypoints: "websecure"
+      traefik.http.routers.r2r-front.tls: "true"
+      traefik.http.routers.r2r-front.tls.certresolver: 'letsencryptprod'
+
+      # редиректим www на не-www
+      traefik.http.routers.r2r-front-www.rule: 'Host(`www.r2r.studio`)'
+      traefik.http.routers.r2r-front-www.entrypoints: "websecure"
+      traefik.http.routers.r2r-front-www.tls: "true"
+      traefik.http.routers.r2r-front-www.tls.certresolver: 'letsencryptprod'
+      traefik.http.middlewares.r2r-redirect-www.redirectregex.regex: ^https://www.r2r.studio(/?)(.*)
+      traefik.http.middlewares.r2r-redirect-www.redirectregex.replacement: https://r2r.studio/$${2}
+      traefik.http.middlewares.r2r-redirect-www.redirectregex.permanent: true
+      traefik.http.routers.r2r-front-www.middlewares: r2r-redirect-www
+
+      # всегда добавляет слэш в конец пути
+      #traefik.http.middlewares.with-trailing-slash.redirectRegex.permanent: true
+      #traefik.http.middlewares.with-trailing-slash.redirectRegex.regex: '^https?://(.*)/(.+)'
+      #traefik.http.middlewares.with-trailing-slash.redirectRegex.replacement: "https://${1}/${2}/"
+
+      # reverse proxy /help page
+      # traefik.http.routers.s2erp-promo-help-reverse.rule: '(Host(`new.salesap.ru`) || Host(`salesap.ru`)) && PathPrefix(`/help`)'
+      # traefik.http.routers.s2erp-promo-help-reverse.entrypoints: "websecure"
+      # traefik.http.routers.s2erp-promo-help-reverse.tls: "true"
+      # traefik.http.routers.s2erp-promo-help-reverse.tls.certresolver: 'letsencryptprod'
+      # traefik.http.routers.s2erp-promo-help-reverse.service: 'old-salesap@file'
+      # traefik.http.middlewares.help-add-slash.redirectregex.regex: '(^.*\/help$$)'
+      # traefik.http.middlewares.help-add-slash.redirectregex.replacement: '$$1/'
+      # traefik.http.middlewares.help-add-slash.redirectregex.permanent: true
+      # traefik.http.routers.s2erp-promo-help-reverse.middlewares: help-add-slash
+
+      # reverse proxy /blog page
+      # Matches requests with a non-empty path and only ones that do not end with
+      # a file extension (e.g. '.jpg') or an already existing trailing slash
+      #traefik.http.routers.s2erp-promo-blog-reverse.rule: '(Host(`new.salesap.ru`) || Host(`salesap.ru`) || Host(`www.salesap.ru`)) && PathPrefix(`/blog`)'
+      #traefik.http.routers.s2erp-promo-blog-reverse.entrypoints: "websecure"
+      #traefik.http.routers.s2erp-promo-blog-reverse.tls: "true"
+      #traefik.http.routers.s2erp-promo-blog-reverse.tls.certresolver: 'letsencryptprod'
+      #traefik.http.routers.s2erp-promo-blog-reverse.service: 'old-salesap@file'
+      #traefik.http.middlewares.blog-add-slash.redirectregex.regex: '(^.*\/blog$$)'
+      #traefik.http.middlewares.blog-add-slash.redirectregex.replacement: '$$1/'
+      #traefik.http.middlewares.blog-add-slash.redirectregex.permanent: true
+      #traefik.http.routers.s2erp-promo-blog-reverse.middlewares: blog-add-slash
+
+      # reverse proxy /sitemap.xml to sitecms.salesap.ru/sitemap/index.xml
+      traefik.http.routers.r2r-sitemap-reverse.rule: '(Host(`r2r.studio`)) && Path(`/sitemap.xml`)'
+      traefik.http.routers.r2r-sitemap-reverse.entrypoints: "websecure"
+      traefik.http.routers.r2r-sitemap-reverse.tls: "true"
+      traefik.http.routers.r2r-sitemap-reverse.tls.certresolver: 'letsencryptprod'
+      traefik.http.routers.r2r-sitemap-reverse.service: 'strapi-r2r-studio@docker'
+      traefik.http.middlewares.sitemap-replacepath.replacepath.path: /sitemap/index.xml
+      traefik.http.routers.r2r-sitemap-reverse.middlewares: sitemap-replacepath
+
+      # редиректы на всякие страницы
+      # traefik.http.middlewares.promo-paths-0.redirectregex.regex: ^https://((new.)?salesap.ru)/funktsii-crm/upravlenie-finansami-v-crm-sisteme(/?)(.*)
+      # traefik.http.middlewares.promo-paths-0.redirectregex.replacement: https://$${1}/produkty/CRM-dlja-finansov/$${3}
+      # traefik.http.middlewares.promo-paths-0.redirectregex.permanent: true
+      # traefik.http.routers.s2erp-promo-front.middlewares: promo-paths-0,promo-paths-1,promo-paths-2,promo-paths-3,promo-paths-4,promo-paths-5,promo-paths-6,promo-paths-7,promo-paths-8,promo-paths-9,promo-paths-10,promo-paths-11,promo-paths-12,promo-paths-13,promo-paths-14,promo-paths-15,promo-paths-16,promo-paths-17,promo-paths-18,promo-paths-19,promo-paths-20,promo-paths-21,promo-paths-22,promo-paths-23,promo-paths-24,promo-paths-25,promo-paths-26,promo-paths-27,promo-paths-28,promo-paths-29,promo-paths-30,promo-paths-31,promo-paths-32,promo-paths-33,promo-paths-34,promo-paths-35,promo-paths-36,promo-paths-37,promo-paths-38,promo-paths-39,promo-paths-40,promo-paths-41,promo-paths-42,promo-paths-43,promo-paths-44,promo-paths-45,promo-paths-46,promo-paths-47,promo-paths-48,promo-paths-49
+
+    # https://docs.docker.com/compose/compose-file/deploy/
+    deploy:
+      mode: replicated
+      replicas: 3
+      # labels:
+      #   traefik.enable: 'true'
+      #   # service name must be same as in HELM_RELEASE_NAME
+      #   traefik.http.services.r2r-front.loadbalancer.server.port: '5000'
+      #   # traefik.http.middlewares.metabase_cors.headers.accesscontrolallowmethods: 'GET'
+      #   # traefik.http.middlewares.metabase_cors.headers.accesscontrolalloworiginlist: 'https://app.gb.salesap.ru,https://app.salesap.ru'
+      #   # traefik.http.middlewares.metabase_cors.headers.addvaryheader: 'true'
+      #   traefik.http.routers.r2r-front.rule: 'Host(`r2r.studio`)'
+      #   # когда окончательно перейдем на домен salesap.ru, надо будет раскомментить строку ниже
+      #   # traefik.http.routers.s2erp-promo-front.rule: 'Host(`new.salesap.ru`) || Host(`salesap.ru`) || Host(`www.salesap.ru`)'
+      #   # traefik.http.routers.metabase.middlewares: "metabase_cors{{ (swarm_metabase_basicauth | default([]) | length > 0) | ternary(',metabase_auth', '') }}"
+      #   traefik.http.routers.r2r-front.entrypoints: "websecure"
+      #   traefik.http.routers.r2r-front.tls: "true"
+      #   traefik.http.routers.r2r-front.tls.certresolver: 'letsencryptprod'
+        # traefik.http.middlewares.metabase_auth.basicauth.users: '{{ swarm_metabase_basicauth | default([]) | join(",") }}'
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+        delay: 10s
+        max_attempts: 3
+        window: 120s
+      # placement:
+      #   constraints:
+      #     - "node.role==manager"
+
+  green-web:
+    <<: *web
+    # container_name: green-web
+
+networks:
+  default:
+    name: web
+    external: true
+
+volumes:
+  front-next-cache:
