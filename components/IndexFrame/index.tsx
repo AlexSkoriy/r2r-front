@@ -86,9 +86,7 @@ export default function FirstFrame({ global }: { global: IGlobal }) {
           <div className="font-drukcyr desktop:h1012:text-[17dvh] desktop:h1012:leading-[15dvh] text-[8.5dvh]  desktop:text-[8.7vw] !tracking-[0px] desktop:!tracking-[-1] leading-[7.5dvh] desktop:leading-[7.8vw]  mt-[5px] desktop:mt-0  uppercase font-bold">
             <div className="animate-fade-left animate-duration-500 animate-delay-[500ms]">Seize </div>
             <div className="animate-fade-left animate-duration-500 animate-delay-[800ms]">Trade </div>
-            <div className="animate-fade-left animate-duration-500 animate-delay-[1100ms] whitespace-nowrap">Cover&nbsp;
-              <span className=" desktop:leading-[7.2vw] ml-[0px] desktop:ml-[10px] text-[3.44dvh] desktop:text-[3.2vw]  destop:leading-[10dvh] align-top ">★</span>
-            </div>
+            <div className="animate-fade-left animate-duration-500 animate-delay-[1100ms] whitespace-nowrap">Cover</div>
           </div>
           <p className="desktop:text-[20px] text-[15px]  desktop:w-[262px] w-[209px] uppercase animate-fade-left animate-duration-500 animate-delay-[1400ms] mt-[2dvh] desktop:h1012:mt-[2dvh] desktop:mt-[25px] leading-[21px] desktop:leading-[24px] tracking-[0.1px] desktop:tracking-[0.5px]">
             Dice Roll Business empire RPG
