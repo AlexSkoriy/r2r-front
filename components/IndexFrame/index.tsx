@@ -1,6 +1,3 @@
-import vk from "@/public/icons/vk.svg"
-import tg from "@/public/icons/tg.svg"
-import ok from "@/public/icons/ok.svg"
 import logo from "@/public/images/logo-block-boss.png"
 import imageEdging from "@/public/images/imageEdging.png"
 import Image from "next/image"
@@ -8,6 +5,24 @@ import { IGlobal } from "@/types"
 import Sound from "../Sound"
 export const dynamic = 'force-dynamic'
 import Link from "next/link"
+import { FaFacebookF, FaDiscord } from "react-icons/fa"
+
+// Соцсети сайта. Чтобы поменять ссылку или добавить сеть — правим этот массив.
+// Иконки берутся из react-icons и наследуют цвет текста, отдельные файлы не нужны.
+const SOCIALS = [
+  {
+    label: "Facebook",
+    href: "https://www.facebook.com/theblockboss",
+    Icon: FaFacebookF,
+    iconClass: "text-[15px] desktop:text-[26px]",
+  },
+  {
+    label: "Discord",
+    href: "https://discord.gg/tDvnQyH4yc",
+    Icon: FaDiscord,
+    iconClass: "text-[18px] desktop:text-[30px]",
+  },
+]
 
 export default function FirstFrame({ global }: { global: IGlobal }) {
 
@@ -32,13 +47,22 @@ export default function FirstFrame({ global }: { global: IGlobal }) {
 
       <header className="desktop:grid flex grid-cols-3 desktop:mt-[76px] mt-[8.4dvh] pl-[20px] justify-between mr-[70px] ">
         <div className=" flex gap-[10px] items-center desktop:ml-[45px] ml-[17px] desktop:order-1 order-2 flex-1  desktop:justify-start min-w-max">
-          <a href={global.data.global.data.attributes.link_vk} className="border-[2px] border-skin rounded-full desktop:h-[60px] h-[36px] desktop:w-[60px] w-[36px] flex items-center justify-center" target="_blank"><Image className="w-[10px] desktop:w-[19px]" src={vk} width={19} height={14} alt="" /></a>
-          <a href={global.data.global.data.attributes.link_tg} className="border-[2px] border-skin rounded-full desktop:h-[60px] h-[36px] desktop:w-[60px] w-[36px] flex items-center justify-center" target="_blank"><Image className="w-[10px] desktop:w-[19px]" src={tg} width={19} height={11} alt="" /></a>
-          <a href={global.data.global.data.attributes.link_ok} className="border-[2px] border-skin rounded-full desktop:h-[60px] h-[36px] desktop:w-[60px] w-[36px] flex items-center justify-center" target="_blank"><Image className="w-[20px] desktop:w-[29px]" src={ok} width={29} height={20} alt="" /></a>
+          {SOCIALS.map(({ label, href, Icon, iconClass }) => (
+            <a
+              key={label}
+              href={href}
+              aria-label={label}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="border-[2px] border-skin rounded-full desktop:h-[60px] h-[36px] desktop:w-[60px] w-[36px] flex items-center justify-center"
+            >
+              <Icon className={iconClass} />
+            </a>
+          ))}
           <span className="text-[20px] ml-[20px] hidden desktop:block tablet:hidden">Follow us and stay tuned</span>
         </div>
         <div className="flex items-center justify-center desktop:order-2 order-1 shrink-0 desktop:w-full">
-          <Image src={logo} width={648} height={162} alt="Block Boss" className="h-[24px] phxs:h-[20px] w-auto desktop:h-[73px]" />
+          <Image src={logo} width={648} height={162} alt="Block Boss" className="h-[28px] phxs:h-[24px] w-auto desktop:h-[73px]" />
         </div>
         <Sound />
       </header>
@@ -73,12 +97,12 @@ export default function FirstFrame({ global }: { global: IGlobal }) {
           <div className="flex items-center gap-[10px] desktop:mt-[50px] mt-[25px]">
             <div className="relative">
               <Link className="rounded-[11px] relative pointer-events-auto bg-skin desktop:w-[190px] desktop:h-[74px] w-[139px] h-[59px] flex items-center justify-center shadow-[0px_6px_0px_0px_#b8341f]" href={linkApp1 ?? "#"} >
-                <img className="w-[107px] h-[25px] desktop:w-[146px] desktop:h-[35px]" src="/icons/google_play.svg" width={146} height={35} />
+                <img className="w-[107px] h-[25px] desktop:w-[146px] desktop:h-[35px]" src="/icons/google_play.svg" width={146} height={35} alt="Get it on Google Play" />
               </Link>
             </div>
             <div className="relative">
               <Link className="rounded-[11px] relative pointer-events-auto bg-skin desktop:w-[190px] desktop:h-[74px] w-[139px] h-[59px] flex items-center justify-center shadow-[0px_6px_0px_0px_#b8341f]" href={linkApp2 ?? "#"} >
-                <img className="w-[107px] h-[29px] desktop:w-[146px] desktop:h-[40px]" src="/icons/app_store.svg" width={146} height={40} />
+                <img className="w-[107px] h-[29px] desktop:w-[146px] desktop:h-[40px]" src="/icons/app_store.svg" width={146} height={40} alt="Download on the App Store" />
               </Link>
             </div>
           </div>

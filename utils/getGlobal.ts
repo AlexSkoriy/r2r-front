@@ -33,9 +33,6 @@ export async function getGlobalData() {
                 }
                 app_store
                 google_play
-                link_tg,
-                link_vk,
-                link_ok
                 robots_txt
               }
             }

@@ -22,9 +22,6 @@ export interface Attributes {
   logo: File;
   app_store: string
   google_play: string
-  link_tg: string
-  link_vk: string
-  link_ok: string
   robots: string
 }
 
