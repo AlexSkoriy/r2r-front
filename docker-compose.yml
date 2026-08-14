@@ -14,6 +14,14 @@ services:
     # container_name: blue-web
     depends_on:
       - volumes-init
+    # Политика перезапуска. Секции deploy/restart_policy ниже НЕДОСТАТОЧНО:
+    # она действует только в Docker Swarm, а обычный docker compose её игнорирует.
+    # Без этой строки сайт не поднимается после перезагрузки сервера —
+    # именно так он и упал 14.08.2026.
+    # unless-stopped, а не always: иначе после перезагрузки поднимется и green
+    # со старой версией, и два набора контейнеров начнут спорить за один
+    # и тот же роутер Traefik.
+    restart: unless-stopped
     image: 127.0.0.1:5000/stackdemo
     # UID/GID пользователя cnb в контейнере
     user: "744:744"
