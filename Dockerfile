@@ -7,8 +7,11 @@
 # ---------- этап 1: зависимости ----------
 FROM node:20-alpine AS deps
 WORKDIR /app
+# libc6-compat нужен нативным модулям на alpine, sharp — оптимизатору картинок next/image
+RUN apk add --no-cache libc6-compat
 COPY package.json yarn.lock ./
-RUN yarn install --frozen-lockfile --network-timeout 600000
+RUN yarn install --frozen-lockfile --network-timeout 600000 \
+  && npm install --no-save sharp
 
 # ---------- этап 2: сборка ----------
 FROM node:20-alpine AS builder
@@ -29,6 +32,7 @@ RUN yarn build
 # ---------- этап 3: запуск ----------
 FROM node:20-alpine AS runner
 WORKDIR /app
+RUN apk add --no-cache libc6-compat
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV PORT=3000
